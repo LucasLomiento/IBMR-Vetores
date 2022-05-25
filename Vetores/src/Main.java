@@ -8,7 +8,7 @@ class Main {
     static final String[] NOMES_AVALIACOES = {"A1", "A2", "A3"};
     static final double[] NOTA_MAX_AVALIACOES = {30.00, 30.00, 40.00};
     static double[] notas = new double[TOTAL_AVALIACOES];
-
+    static boolean provaAIFeita = false;
 
     /**
      * Ler uma nota do usuário
@@ -51,13 +51,19 @@ class Main {
      */
     static String avaliarSituacao(double notaFinal) {
 
-        if (notaFinal < 30)
-            return "REPROVADO";
-        else if (notaFinal < 70)
-            return "EM RECUPERAÇÃO";
-        else
-            return "APROVADO";
-
+        if(!provaAIFeita) {
+            if (notaFinal < 30)
+                return "REPROVADO";
+            else if (notaFinal < 70)
+                return "EM RECUPERAÇÃO";
+            else
+                return "APROVADO";
+        }else{
+            if (notaFinal < 70)
+                return "REPROVADO (PROVA AI FEITA)";
+            else
+                return "APROVADO (PROVA AI FEITA)";
+        }
     } // Fim do método avaliarSituacao()
 
 
@@ -95,12 +101,13 @@ class Main {
 
 
     /**
-     * vale 30 pontos
-     * substitui a menor nota entre A1 e A2
+     * Prova AI
+     * Vale 30 pontos
+     * Substitui a menor nota entre A1 e A2
      */
     static void provaAI(double[] notas) {
         double notaAi = 0;
-        int piorProvaIndex = notas[0] <= notas[1] ? 0 : 1;
+        int piorProvaIndex = notas[0] <= notas[1] ? 0 : 1; //Verifica a menor entre as 2 primeira notas.
 
         System.out.println("Digite A Nota Da Prova AI");
         notaAi = lerNota("Prova AI", NOTA_MAX_AVALIACOES[piorProvaIndex]);
@@ -109,11 +116,10 @@ class Main {
             notas[piorProvaIndex] = notaAi;
             System.out.printf("A Avaliação %s Foi Substituida Pela Avalição AI\n", NOMES_AVALIACOES[piorProvaIndex]);
         } else {
-            System.out.println("A Nota Da Prova AI Não Foi Suficiente Para Alterar A ");
+            System.out.println("A Nota Da Prova AI Não Foi Suficiente Para Alterar Alguma Prova");
         }
 
-
-    }
+    } // Fim do método provaAI()
 
     /**
      * Verifica se deseja fazer a prova AI
@@ -122,16 +128,17 @@ class Main {
 
         if (calcularMedia(notas) <= 23.0 && calcularMedia(notas) >= 10.0 && (notas[0] + notas[1]) < 60) {
             System.out.print("""
-                    \nDeseja Cadastrar Nota Prova AI?
+                    Deseja Cadastrar Nota Prova AI?
                     Digite SIM ou NÃO:\s""");
             String opcao = console.next();
 
             boolean checkOpcao = false;
             while (!checkOpcao) {
                 if (opcao.equalsIgnoreCase("sim")) {
+                    provaAIFeita = true;
+                    checkOpcao = true;
                     provaAI(notas);
                     mostrarNotas();
-                    checkOpcao = true;
                 } else if (opcao.equalsIgnoreCase("não") || opcao.equalsIgnoreCase("nao")) {
                     System.out.println("Opção Digitada: Não");
                     checkOpcao = true;
@@ -144,7 +151,7 @@ class Main {
 
         }
 
-    }
+    } // Fim do método opcaoProvaAI()
 
     /**
      * Mostra na tela um relatório das notas do estudante
@@ -154,6 +161,7 @@ class Main {
         double notaFinal = 0.0;
 
         System.out.println("""
+                                
                                 NOTAS
                         """);
 
@@ -172,12 +180,9 @@ class Main {
                         Melhor Prova = %s
                         
                         """, notaFinal, avaliarSituacao(notaFinal),calcularMedia(notas),maiorNota(notas));
-        System.out.print("Aperte Enter Para Continuar\n");
-
+        System.out.print("Aperte ENTER Para Continuar\n");
         console.nextLine();
         console.nextLine();
-
-
 
     } // Fim do método mostrarNotas()
 
@@ -188,6 +193,7 @@ class Main {
     static void mostrarMenu() {
 
         System.out.println("""
+                        
                         Menu
                 
                 [1] Cadastrar Nota A1
